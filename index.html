@@ -66,7 +66,7 @@
             max-width: 600px;
         }
 
-        input[type="text"] {
+        input[type="text"], input[type="password"] {
             flex-grow: 1;
             padding: 10px;
             font-size: 1em;
@@ -76,7 +76,7 @@
             color: #ffffff;
         }
 
-        input[type="text"]::placeholder {
+        input[type="text"]::placeholder, input[type="password"]::placeholder {
             color: #888;
         }
 
@@ -143,9 +143,16 @@
             background-color: #ff3333;
         }
 
-        /* Blur effect when popup is visible */
-        .blur {
-            filter: blur(5px);
+        /* Login form */
+        #loginForm {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #loginForm input {
+            margin: 10px;
         }
 
         /* Scrolling text at the bottom */
@@ -178,6 +185,11 @@
             }
         }
 
+        /* Multiple account section */
+        .account {
+            display: none; /* Hidden by default */
+        }
+
     </style>
 </head>
 <body>
@@ -200,6 +212,25 @@
         </div>
     </div>
 
+    <!-- Login Form -->
+    <div id="loginForm" class="blur">
+        <input type="text" id="usernameInput" placeholder="Username" required>
+        <input type="password" id="passwordInput" placeholder="Password" required>
+        <button type="submit" id="loginButton">Login</button>
+    </div>
+
+    <!-- Multiple Account Section (Add more accounts here) -->
+    <div class="account" id="account1" data-username="dcode" data-password="251729">
+        <p>Username: user1 | Password: pass1</p>
+    </div>
+    <div class="account" id="account2" data-username="csharp" data-password="5732">
+        <p>Username: user2 | Password: pass2</p>
+    </div>
+    <div class="account" id="account3" data-username="spyeye" data-password="spyeye">
+        <p>Username: user3 | Password: pass3</p>
+    </div>
+    <!-- Add more accounts here as needed -->
+    
     <!-- Firebase App (compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <!-- Firebase Database (compat) -->
@@ -224,37 +255,74 @@
         // Initialize Firebase Database
         const db = firebase.database();
 
-        // Handle form submission
+        // Handle form submission for messages
         document.getElementById("inputForm").addEventListener("submit", function (e) {
             e.preventDefault();
             
+            const username = localStorage.getItem("username") || "Anonymous"; // Default username is "Anonymous"
             const message = document.getElementById("messageInput").value.trim();
+
             if (message) {
-                // Push the message to Firebase
-                db.ref('messages').push(message);
+                db.ref("messages").push({
+                    username: username,
+                    message: message
+                });
                 document.getElementById("messageInput").value = ''; // Clear input field
             }
         });
 
-        // Display messages from the database in real-time
-        db.ref('messages').on('child_added', snapshot => {
-            const message = snapshot.val();
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
-            messageDiv.innerHTML = `<span class="username">Anonymous:</span> ${message}`;
+        // Listen for new messages in Firebase
+        db.ref("messages").on("child_added", function (snapshot) {
+            const data = snapshot.val();
+            const username = data.username;
+            const message = data.message;
+
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message");
+            messageDiv.innerHTML = `<span class="username">${username}:</span> ${message}`;
             document.getElementById("messages").appendChild(messageDiv);
             document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
         });
 
-        // Access key handling
-        const accessKey = "5732";
+        // Handle access key validation
         document.getElementById("enterButton").addEventListener("click", function () {
-            const inputKey = document.getElementById("accessInput").value.trim();
-            if (inputKey === accessKey) {
-                document.getElementById("accessPopup").style.display = "none";
-                document.querySelectorAll('.blur').forEach(el => el.classList.remove('blur'));
+            const accessKey = document.getElementById("accessInput").value.trim();
+            if (accessKey === "5732") {
+                document.getElementById("accessPopup").style.display = "none"; // Hide access popup
+                document.getElementById("forumTitle").classList.remove("blur");
+                document.getElementById("messages").classList.remove("blur");
+                document.getElementById("inputForm").classList.remove("blur");
+                document.getElementById("scrollingTextContainer").classList.remove("blur");
+                document.getElementById("loginForm").style.display = "flex"; // Show login form after access key is correct
             } else {
-                alert("Incorrect access key!");
+                alert("Incorrect access key.");
+            }
+        });
+
+        // Handle login submission
+        document.getElementById("loginButton").addEventListener("click", function (e) {
+            e.preventDefault();
+            const username = document.getElementById("usernameInput").value.trim();
+            const password = document.getElementById("passwordInput").value.trim();
+
+            // Check if username and password match any account
+            let validUser = false;
+            const accounts = document.querySelectorAll(".account");
+            accounts.forEach(function(account) {
+                const accountUsername = account.getAttribute("data-username");
+                const accountPassword = account.getAttribute("data-password");
+
+                if (username === accountUsername && password === accountPassword) {
+                    localStorage.setItem("username", username); // Store username
+                    validUser = true;
+                }
+            });
+
+            if (validUser) {
+                document.getElementById("loginForm").style.display = "none"; // Hide login form
+                document.getElementById("inputForm").style.display = "block"; // Allow message sending
+            } else {
+                alert("Incorrect username or password.");
             }
         });
     </script>
