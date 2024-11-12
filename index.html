@@ -3,18 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RattHatter Forum</title>
+    <title>Ratt Hatter</title>
     <style>
-        /* Your CSS styling here */
+        /* General styling */
+        body {
+            background-color: #000000;
+            color: #ff0000;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #ff0000;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+            }
+            to {
+                text-shadow: 0 0 20px #ff3333, 0 0 40px #ff3333, 0 0 60px #ff3333;
+            }
+        }
+
+        #messages {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            width: 90%;
+            max-width: 600px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .message {
+            padding: 8px;
+            border-bottom: 1px solid #333;
+            font-size: 1em;
+            color: #ffffff;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #00acee;
+        }
+
+        form {
+            display: flex;
+            width: 90%;
+            max-width: 600px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #333;
+            border-radius: 4px 0 0 4px;
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+
+        input[type="text"]::placeholder {
+            color: #888;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #ff0000;
+            border: none;
+            color: #ffffff;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #ff3333;
+        }
+
+        /* Access key popup overlay */
+        #accessPopup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001; /* Increased z-index to make sure it's above other elements */
+            color: #ffffff;
+        }
+
+        #accessPopup h2 {
+            margin-bottom: 50px;
+            margin-top: 300px;
+            color: #ff0000;
+            font-size: 30px;
+        }
+
+        #accessInput {
+            padding: 10px 50px;
+            font-size: 1em;
+            border: solid;
+            border-radius: 4px;
+            margin-bottom: 50px;
+            text-align: center;
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+
+        #enterButton {
+            padding: 10px 50px;
+            font-size: 1em;
+            background-color: #ff0000;
+            border: none;
+            margin-bottom: 300px;
+            color: #ffffff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        #enterButton:hover {
+            background-color: #ff3333;
+        }
+
+        /* Blur effect when popup is visible */
+        .blur {
+            filter: blur(5px);
+        }
+
+        /* Scrolling text at the bottom */
+        #scrollingTextContainer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            overflow: hidden;
+            background-color: #121212;
+            border-top: 2px solid #ff0000;
+            z-index: 1000; /* Lower z-index to ensure it's below the access popup */
+        }
+
+        #scrollingText {
+            display: inline-block;
+            color: #ff0000;
+            font-size: 1.2em;
+            white-space: nowrap;
+            text-align: center;
+            padding: 10px 0;
+            animation: scrollingText 0.3s infinite linear;
+        }
+
+        @keyframes scrollingText {
+            from {
+                transform: translateX(1.5%);
+            }
+            to {
+                transform: translateX(-4.8%);
+            }
+        }
+
     </style>
 </head>
 <body>
-    <h1>RattHatter Forum</h1>
-    <div id="messages"></div>
-    <form id="inputForm">
+    <div id="accessPopup">
+        <h2>Enter the Access Key</h2>
+        <input type="text" id="accessInput" placeholder="Access Key">
+        <button id="enterButton">Enter</button>
+    </div>
+
+    <h1 id="forumTitle" class="blur">Ratt Hatter</h1>
+    <div id="messages" class="blur"></div>
+    <form id="inputForm" class="blur">
         <input type="text" id="messageInput" placeholder="Type your message here..." required>
         <button type="submit" id="sendButton">Send</button>
     </form>
+
+    <div id="scrollingTextContainer">
+        <div id="scrollingText">
+            <span>ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • ratthatter • </span>
+        </div>
+    </div>
 
     <!-- Firebase App (compat) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -36,9 +220,6 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        
-        // Enable Firebase logging
-        firebase.database.enableLogging(true);
 
         // Initialize Firebase Database
         const db = firebase.database();
@@ -63,6 +244,18 @@
             messageDiv.innerHTML = `<span class="username">Anonymous:</span> ${message}`;
             document.getElementById("messages").appendChild(messageDiv);
             document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+        });
+
+        // Access key handling
+        const accessKey = "5732";
+        document.getElementById("enterButton").addEventListener("click", function () {
+            const inputKey = document.getElementById("accessInput").value.trim();
+            if (inputKey === accessKey) {
+                document.getElementById("accessPopup").style.display = "none";
+                document.querySelectorAll('.blur').forEach(el => el.classList.remove('blur'));
+            } else {
+                alert("Incorrect access key!");
+            }
         });
     </script>
 </body>
