@@ -6,17 +6,34 @@
     <title>Ratt Hatter</title>
     <style>
         /* General styling */
-        body {
-            background-color: #000000;
-            color: #ff0000;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
-            overflow: hidden;
-        }
+body {
+    background-color: #000000;
+    background-image: url('https://data.1freewallpapers.com/detail/black-lines-stripes-dark-background-dark.jpg'); /* Your background image */
+    background-size: cover; /* Ensure the image covers the entire body */
+    background-position: center; /* Center the image */
+    background-attachment: fixed; /* Make the background image fixed during scrolling */
+    color: #ff0000;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
+    overflow: hidden;
+}
+
+/* Add a dark overlay on top of the background image */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: -1; /* Ensure it stays behind the content */
+}
+
 
         h1 {
             font-size: 3em;
@@ -94,21 +111,22 @@
             background-color: #ff3333;
         }
 
-        /* Access key popup overlay */
-        #accessPopup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001; /* Increased z-index to make sure it's above other elements */
-            color: #ffffff;
-        }
+/* Access key popup overlay */
+#accessPopup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000; /* Change to black background */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001; /* Increased z-index to make sure it's above other elements */
+    color: #ffffff;
+}
+
 
         #accessPopup h2 {
             margin-bottom: 50px;
@@ -152,7 +170,7 @@
         }
 
         #loginForm input {
-            margin: 10px;
+            margin: 4px;
         }
 
         /* Scrolling text at the bottom */
